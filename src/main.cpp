@@ -150,27 +150,54 @@ int main()
 
     // Cube vertices
     float vertices[] = {
-        // Front and back corners
-        -0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f, -0.5f,
-         0.5f,  0.5f, -0.5f,
-        -0.5f,  0.5f, -0.5f,
 
-        -0.5f, -0.5f,  0.5f,
-         0.5f, -0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f
-    };
+    // Positions              // Normals
 
-    // Cube face indices
-    unsigned int indices[] = {
-        0, 1, 2,  2, 3, 0, // Back
-        4, 5, 6,  6, 7, 4, // Front
-        0, 4, 7,  7, 3, 0, // Left
-        1, 5, 6,  6, 2, 1, // Right
-        3, 2, 6,  6, 7, 3, // Top
-        0, 1, 5,  5, 4, 0  // Bottom
-    };
+    // Back face
+    -0.5f,-0.5f,-0.5f,  0,0,-1,
+     0.5f,-0.5f,-0.5f,  0,0,-1,
+     0.5f, 0.5f,-0.5f,  0,0,-1,
+    -0.5f, 0.5f,-0.5f,  0,0,-1,
+
+    // Front face
+    -0.5f,-0.5f, 0.5f,  0,0,1,
+     0.5f,-0.5f, 0.5f,  0,0,1,
+     0.5f, 0.5f, 0.5f,  0,0,1,
+    -0.5f, 0.5f, 0.5f,  0,0,1,
+
+    // Left face
+    -0.5f,-0.5f,-0.5f, -1,0,0,
+    -0.5f,-0.5f, 0.5f, -1,0,0,
+    -0.5f, 0.5f, 0.5f, -1,0,0,
+    -0.5f, 0.5f,-0.5f, -1,0,0,
+
+    // Right face
+     0.5f,-0.5f,-0.5f,  1,0,0,
+     0.5f,-0.5f, 0.5f,  1,0,0,
+     0.5f, 0.5f, 0.5f,  1,0,0,
+     0.5f, 0.5f,-0.5f,  1,0,0,
+
+    // Bottom face
+    -0.5f,-0.5f,-0.5f,  0,-1,0,
+     0.5f,-0.5f,-0.5f,  0,-1,0,
+     0.5f,-0.5f, 0.5f,  0,-1,0,
+    -0.5f,-0.5f, 0.5f,  0,-1,0,
+
+    // Top face
+    -0.5f,0.5f,-0.5f,  0,1,0,
+     0.5f,0.5f,-0.5f,  0,1,0,
+     0.5f,0.5f, 0.5f,  0,1,0,
+    -0.5f,0.5f, 0.5f,  0,1,0
+};
+
+unsigned int indices[] = {
+     0, 1, 2,  2, 3, 0,
+     4, 5, 6,  6, 7, 4,
+     8, 9,10, 10,11, 8,
+    12,13,14, 14,15,12,
+    16,17,18, 18,19,16,
+    20,21,22, 22,23,20
+};
 
     unsigned int VAO, VBO, EBO;
 
@@ -196,10 +223,22 @@ int main()
         GL_STATIC_DRAW
     );
 
-    glVertexAttribPointer(
-        0, 3, GL_FLOAT, GL_FALSE,
-        3 * sizeof(float), (void*)0
-    );
+   // Position attribute
+glVertexAttribPointer(
+    0, 3, GL_FLOAT, GL_FALSE,
+    6 * sizeof(float), (void*)0
+);
+
+glEnableVertexAttribArray(0);
+
+// Normal attribute
+glVertexAttribPointer(
+    1, 3, GL_FLOAT, GL_FALSE,
+    6 * sizeof(float),
+    (void*)(3 * sizeof(float))
+);
+
+glEnableVertexAttribArray(1);
 
     glEnableVertexAttribArray(0);
 
@@ -243,7 +282,21 @@ int main()
     glUniformMatrix4fv(
         projectionLoc, 1, GL_FALSE, glm::value_ptr(projection)
     );
+int lightPosLoc = glGetUniformLocation(shaderProgram, "lightPos");
+int viewPosLoc = glGetUniformLocation(shaderProgram, "viewPos");
+int objectColorLoc = glGetUniformLocation(shaderProgram, "objectColor");
+int lightColorLoc = glGetUniformLocation(shaderProgram, "lightColor");
 
+glUseProgram(shaderProgram);
+
+glUniform3f(lightPosLoc, 1.2f, 1.5f, 2.0f);
+
+glUniform3f(viewPosLoc, 0.0f, 0.0f, 3.0f);
+
+// Gold-like material
+glUniform3f(objectColorLoc, 1.0f, 0.65f, 0.15f);
+
+glUniform3f(lightColorLoc, 1.0f, 1.0f, 1.0f);
     // Render loop
     while (!glfwWindowShouldClose(window))
     {
